@@ -1,19 +1,42 @@
+// projet omelette par Georges Grande
+
 let personnage = {
     nom:"Georges",
-    lieu:"Bruxelles",
+    lieu:"",
     argent: 100,
     mainDroite:[],
     mainGauche:[],
-    seDéplacer:(lieu),
-    payerArticle:(article),
-    couper:(ingrédient, outil),
+    seDéplacer(lieu) {
+        this.lieu = lieu
+    },
+    payerArticle(article) {
+        this.article = article
+        if (this.argent >= article.prix) {
+            this.argent -= article.prix;
+            console.log(`${personnage.nom} a payé ${article.prix} euro(s) pour un(e) ${article.nom}. Il reste ${this.argent} euros`)
+        }
+        else {
+            console.log(`Pas assez d'argent`)
+        }
+    },
+    couper(ingrédient, outil) {
+        this.ingrédient = ingrédient;
+        this.outil = outil
+        if (outil.action === "couper" && ingrédient.états.includes("entier")) {
+            ingrédient.états = ["coupé"];
+            console.log(`${ingrédient.nom} a été coupé`)
+        }
+        else {
+            console.log(`${ingrédient.nom} ne peut pas être coupé`)
+        }
+    }
 }
 
 
 //maison
 let maison = {
     nom:"Maison de Georges",
-    personnes:["Stephanie", "Ian", "Nora", "Henry"],
+    personnes:[],
 }
 
 
@@ -32,19 +55,22 @@ class Ingrédients {
     }
 }
 
-let oeufs = new Ingrédients ("oeufs", ["entier", "battu"], 1)
-let oignon = new Ingrédients ("oignon", ["entier", "coupé"], 2)
-let fromage = new Ingrédients ("fromage", ["entier", "coupé"], 3)
-let epice = new Ingrédients ("epice", ["entier", "moulu"], 0.5)
+let oeufs = new Ingrédients ("oeufs", ["entier"], 1)
+let oignon = new Ingrédients ("oignon", ["entier"], 2)
+let fromage = new Ingrédients ("fromage", ["coupé"], 3)
+let epice = new Ingrédients ("epice", ["moulu"], 0.5)
 
 
 // epicerie 
 
 let epicerie = {
     nom: "Chez Tom l'epicerie",
-    personnes = ["Tomson", "Gerald", "Amber", "Marth"],
-    paniers = [],
-    ingrédients = [oeufs, oignon, fromage, epice]
+    personnes: ["Tomson", "Gerald", "Amber"],
+    paniers: [
+        { type: "panier1", contenu: [] },
+        { type: "panier2", contenu: [] },
+    ],
+    ingrédients: [oeufs, oignon, fromage, epice],
 }
 
 
@@ -52,16 +78,83 @@ let epicerie = {
 let poêle = {
     nom: "pôele",
     contenu:[],
-    cuire:(),
+    cuire() {
+        setTimeout(() => {}, 4000)
+        this.contenu[0] = "cuit"
+    }
 }
 
 
 // objet bol
 let bol = {
     contenu: [],
-    melanger:(nomDuMelange),
+    melanger(nomDuMelange) {
+        console.log('Le bol contient maintenant une mélange d omelette')
+    }
 }
 
-// Début de l'omelette 
+// -------- Début de l'omelette --------------- 
 
-console.log(personnage.nom + "est actuellement à" + personnage.lieu)
+// 1. se déplacer maison
+
+personnage.seDéplacer(maison.nom)
+console.log(personnage.nom + " est actuellement à " + personnage.lieu)
+
+// 2. se déplacer à l'épicerie 
+
+personnage.seDéplacer(epicerie.nom)
+console.log(personnage.nom + " est actuellement à " + personnage.lieu)
+
+// 3. récupère le panier à l'épicerie
+
+let panier = epicerie.paniers.find(p => p.type === "panier1")
+epicerie.paniers.splice(epicerie.paniers.indexOf(panier), 1)
+personnage.mainDroite.push(panier)
+console.log(`${personnage.nom} a pris un panier`)
+
+// 4. boucle de chaque élément dans l'epicerie et le panier du personnage
+
+for (let ingrédient of epicerie.ingrédients) {
+    panier.contenu.push({...ingrédient});
+    console.log(`${personnage.nom} a ajouté ${ingrédient} au panier`)
+    personnage.payerArticle(ingrédient)
+}
+
+// 5. retourne à la maison
+
+personnage.seDéplacer(maison.nom)
+console.log(personnage.nom + " retourne à la " + personnage.lieu)
+
+// 6. mettre les ingrédients dans le bol
+
+for (let ingrédient of panier.contenu) {
+    bol.contenu.push(ingrédient)
+    console.log(`${ingrédient.nom} on été ajouté au bol`)
+}
+
+// 7. retourne à l'épicerie pour rendre le panier
+
+personnage.seDéplacer(epicerie.nom)
+console.log(personnage.nom + " retourne au " + personnage.lieu + " pour rendre le panier")
+
+// 8. retourne à la maison et continue de cuisinier l'omelette
+
+personnage.seDéplacer(maison.nom)
+console.log(personnage.nom + " retourne à la " + personnage.lieu + " et continue l'omelette")
+
+for (let ingrédient of bol.contenu) {
+    if (ingrédient.états.includes("entier")){
+        personnage.couper(ingrédient, outil)
+    }
+}
+
+// 9. mélanger le contenu du bol
+
+bol.melanger("omelette")
+
+// 10. message final 
+
+
+
+// console.log(personnage)
+// console.log(epicerie)
