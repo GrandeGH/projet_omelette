@@ -89,7 +89,8 @@ let poêle = {
 let bol = {
     contenu: [],
     melanger(nomDuMelange) {
-        console.log('Le bol contient maintenant une mélange d omelette')
+        this.contenu = [{ nom: nomDuMelange, états: ["pas cuite"]}];
+        console.log("Le bol contient maintenant une mélange d'omelette")
     }
 }
 
@@ -114,9 +115,9 @@ console.log(`${personnage.nom} a pris un panier`)
 
 // 4. boucle de chaque élément dans l'epicerie et le panier du personnage
 
-for (let ingrédient of epicerie.ingrédients) {
+for (const ingrédient of epicerie.ingrédients) {
     panier.contenu.push({...ingrédient});
-    console.log(`${personnage.nom} a ajouté ${ingrédient} au panier`)
+    console.log(`${personnage.nom} a ajouté ${ingrédient.nom} au panier`)
     personnage.payerArticle(ingrédient)
 }
 
@@ -127,7 +128,7 @@ console.log(personnage.nom + " retourne à la " + personnage.lieu)
 
 // 6. mettre les ingrédients dans le bol
 
-for (let ingrédient of panier.contenu) {
+for (const ingrédient of panier.contenu) {
     bol.contenu.push(ingrédient)
     console.log(`${ingrédient.nom} on été ajouté au bol`)
 }
@@ -142,7 +143,7 @@ console.log(personnage.nom + " retourne au " + personnage.lieu + " pour rendre l
 personnage.seDéplacer(maison.nom)
 console.log(personnage.nom + " retourne à la " + personnage.lieu + " et continue l'omelette")
 
-for (let ingrédient of bol.contenu) {
+for (const ingrédient of bol.contenu) {
     if (ingrédient.états.includes("entier")){
         personnage.couper(ingrédient, outil)
     }
@@ -152,9 +153,15 @@ for (let ingrédient of bol.contenu) {
 
 bol.melanger("omelette")
 
-// 10. message final 
+// 10. vider le bol
 
+poêle.contenu.push(bol.contenu.pop())
+console.log(`Le bol est maintenant vide, la poêle contient : ${poêle.contenu[0].nom}`)
 
+// 11. message final 
+
+poêle.cuire()
+console.log(poêle)
 
 // console.log(personnage)
 // console.log(epicerie)
